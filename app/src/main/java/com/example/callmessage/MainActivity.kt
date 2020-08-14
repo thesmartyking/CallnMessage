@@ -37,23 +37,72 @@ class MainActivity : AppCompatActivity() {
         imagemsg = findViewById(R.id.msg1)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+            != PackageManager.PERMISSION_GRANTED)
+        {
+            /*ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE),1)
-            Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show()
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS),1)
+            Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show()*/
+
+            val permissions = arrayOf(Manifest.permission.CALL_PHONE,Manifest.permission.SEND_SMS)
+            requestPermissions(permissions, 100)
         }
+        else
+            permissiongranted()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.SEND_SMS
-                    )
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS),1)
+                != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+            == PackageManager.PERMISSION_GRANTED) {
+            val permissions = arrayOf(Manifest.permission.SEND_SMS)
+            requestPermissions(permissions, 100)
+
         }
-      if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-          == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-          == PackageManager.PERMISSION_GRANTED){
-          Toast.makeText(this,"Permission Accessed",Toast.LENGTH_SHORT).show()
+        else
+            permissiongranted()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+            != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+            == PackageManager.PERMISSION_GRANTED) {
+            val permissions = arrayOf(Manifest.permission.CALL_PHONE)
+            requestPermissions(permissions, 100)
+
+        }
+        else
+            permissiongranted()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+            == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+            == PackageManager.PERMISSION_GRANTED) {
+            permissiongranted()
+
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            100 -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    permissiongranted()
+                } else {
+                    Toast.makeText(this, "Permission denied...! So Restart The App", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun permissiongranted()
+    {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+            == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+            == PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this,"Permission Accessed",Toast.LENGTH_SHORT).show()
             mEditTextNumber.setOnFocusChangeListener { v, hasFocus ->
                 callphone_til.setError(null)
                 if (mEditTextNumber.text.toString().trim().isEmpty()) {
@@ -68,9 +117,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     else {
                         if(mEditTextNumber.text.toString().trim().startsWith("9",true)||
-                                mEditTextNumber.text.toString().trim().startsWith("8",true)||
-                                mEditTextNumber.text.toString().trim().startsWith("7",true)||
-                                mEditTextNumber.text.toString().trim().startsWith("6",true)
+                            mEditTextNumber.text.toString().trim().startsWith("8",true)||
+                            mEditTextNumber.text.toString().trim().startsWith("7",true)||
+                            mEditTextNumber.text.toString().trim().startsWith("6",true)
                         )
                         {
                             Log.d("Valid Number:- ","${mEditTextNumber.text} ")
@@ -112,8 +161,6 @@ class MainActivity : AppCompatActivity() {
 
             imagemsg.setOnClickListener { makeMsg() }
         }
-
-
     }
 
     private fun makePhoneCall() {
