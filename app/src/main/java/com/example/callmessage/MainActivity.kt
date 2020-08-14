@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     private val REQUEST_CALL = 1
     private val REQUEST_msg = 1
+    var permissioncode:Int=0
     private lateinit var mEditTextNumber: EditText
     private lateinit var meditmsg: EditText
     private lateinit var imageCall: ImageButton
@@ -37,35 +38,22 @@ class MainActivity : AppCompatActivity() {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.CALL_PHONE
-                    )) {
-            } else {
-
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE),1)
-
-            }
-            /*   finish()*/
-            Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show()
-        } /*else {
-            // Permission has already been granted
-        }*/
-
-        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.SEND_SMS
-                    )) {
-            } else {
-
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS),1)
-
-            }
-            /*   finish()*/
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE),1)
             Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show()
         }
-        else {
-            // Permission has already been granted
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.SEND_SMS
+                    )
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS),1)
+        }
+      if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+          == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+          == PackageManager.PERMISSION_GRANTED){
+          Toast.makeText(this,"Permission Accessed",Toast.LENGTH_SHORT).show()
             mEditTextNumber.setOnFocusChangeListener { v, hasFocus ->
                 callphone_til.setError(null)
                 if (mEditTextNumber.text.toString().trim().isEmpty()) {
@@ -151,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         val msg = meditmsg.text.toString()
         if (number.trim().length > 0 && msg.trim().length > 0) {
 
-                val smsManager = SmsManager.getDefault()
+                val smsManager = SmsManager.getSmsManagerForSubscriptionId(0)
                 smsManager.sendTextMessage(number, null, msg, null, null)
 
 
